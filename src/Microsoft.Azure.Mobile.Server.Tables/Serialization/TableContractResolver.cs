@@ -1,6 +1,6 @@
-﻿// ---------------------------------------------------------------------------- 
+﻿// ----------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// ---------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------
 
 using System;
 using System.Collections.Concurrent;
@@ -16,12 +16,12 @@ namespace Microsoft.Azure.Mobile.Server.Serialization
 {
     /// <summary>
     /// This class implements an <see cref="IContractResolver"/> to provide support for deserialization of the <see cref="Delta{T}"/> type
-    /// using JSON.NET. 
+    /// using JSON.NET.
     /// </summary>
     /// <remarks>
-    /// The contract created for <see cref="Delta{T}"/> will deserialize properties using the types and property names of the 
-    /// underlying type. The <see cref="JsonProperty"/> instances are copied from the underlying type's <see cref="JsonContract"/> and 
-    /// customized to work with a dynamic object. In particular, a custom <see cref="IValueProvider"/> is used to get and set 
+    /// The contract created for <see cref="Delta{T}"/> will deserialize properties using the types and property names of the
+    /// underlying type. The <see cref="JsonProperty"/> instances are copied from the underlying type's <see cref="JsonContract"/> and
+    /// customized to work with a dynamic object. In particular, a custom <see cref="IValueProvider"/> is used to get and set
     /// values using the contract of <see cref="DynamicObject"/>, which <see cref="Delta{T}"/> inherits from.
     /// </remarks>
     public class TableContractResolver : ServiceContractResolver
@@ -40,7 +40,7 @@ namespace Microsoft.Azure.Mobile.Server.Serialization
 
         /// <summary>
         /// Gets the contract for a given type. The type <see cref="Delta{T}"/> is treated specially
-        /// whereas all other types are handled by the base class. 
+        /// whereas all other types are handled by the base class.
         /// </summary>
         /// <param name="objectType">The type to get the contract for.</param>
         /// <returns>A <see cref="JsonContract"/> for the given type.</returns>

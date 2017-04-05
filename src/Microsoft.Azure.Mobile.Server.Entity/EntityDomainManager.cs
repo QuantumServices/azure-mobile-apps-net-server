@@ -127,9 +127,41 @@ namespace Microsoft.Azure.Mobile.Server
             return data;
         }
 
+        public async Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
+
+            var dataItems = data.Select(dataItem =>
+            {
+                if (dataItem.Id == null)
+                {
+                    dataItem.Id = Guid.NewGuid().ToString("N");
+                }
+
+                return dataItem;
+            }).ToList();
+            foreach (var dataItem in dataItems)
+            {
+                this.Context.Set<TData>().Add(dataItem);
+            }
+            //this.Context.Set<TData>().AddRange(dataItems);
+
+            await this.SubmitChangesAsync();
+
+            return dataItems.AsQueryable();
+        }
+
         public async override Task<TData> UpdateAsync(string id, Delta<TData> patch)
         {
             return await this.UpdateAsync(id, patch, this.IncludeDeleted);
+        }
+
+        public async Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
+        {
+            return await this.UpdateAsync(patches, this.IncludeDeleted);
         }
 
         public override Task<TData> UndeleteAsync(string id, Delta<TData> patch)
@@ -286,6 +318,50 @@ namespace Microsoft.Azure.Mobile.Server
             return current;
         }
 
+        private async Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches, bool includeDeleted)
+        {
+            if (patches == null)
+            {
+                throw new ArgumentNullException("patches");
+            }
+
+            // check if Id is not a null or an empty string
+            if (patches.Any(patch => string.IsNullOrWhiteSpace(patch.GetPropertyValueOrDefault<TData, string>(TableUtils.IdPropertyName))))
+            {
+                throw new ArgumentException("Id cannot be null or empty");
+            }
+
+            // make sure there are no duplicate items
+            if (patches.GroupBy(x => x.GetPropertyValueOrDefault<TData, string>(TableUtils.IdPropertyName)).Where(group => group.Count() > 1).Any())
+            {
+                throw new ArgumentException("Cannot have multiple entities with same Id");
+            }
+
+            var ids = patches.Select(patch => patch.GetPropertyValueOrDefault<TData, string>(TableUtils.IdPropertyName));
+            var current = await this.Lookup(ids, includeDeleted).ToListAsync();
+
+            // Check if all the entities exist
+            if (!current.All(x => ids.Contains(x.Id)))
+            {
+                throw new HttpResponseException(this.Request.CreateNotFoundResponse("One or more of the entities does not exist"));
+            }
+
+            foreach (TData item in current)
+            {
+                Delta<TData> patch = patches.Single(x => x.GetPropertyValueOrDefault<TData, string>(TableUtils.IdPropertyName) == item.Id);
+                byte[] patchVersion = patch.GetPropertyValueOrDefault<TData, byte[]>(TableUtils.VersionPropertyName);
+                if (patchVersion != null)
+                {
+                    this.context.Entry(item).OriginalValues[TableUtils.VersionPropertyName] = patchVersion;
+                }
+                patch.Patch(item);
+            }
+
+            await this.SubmitChangesAsync();
+
+            return current;
+        }
+
         private SingleResult<TData> Lookup(string id, bool includeDeleted)
         {
             if (id == null)
@@ -296,6 +372,18 @@ namespace Microsoft.Azure.Mobile.Server
             IQueryable<TData> query = this.Context.Set<TData>().Where(item => item.Id == id);
             query = TableUtils.ApplyDeletedFilter(query, includeDeleted);
             return SingleResult.Create(query);
+        }
+
+        private IQueryable<TData> Lookup(IEnumerable<string> ids, bool includeDeleted)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            IQueryable<TData> query = this.Context.Set<TData>().Where(item => ids.Contains(item.Id));
+            query = TableUtils.ApplyDeletedFilter(query, includeDeleted);
+            return query;
         }
     }
 }

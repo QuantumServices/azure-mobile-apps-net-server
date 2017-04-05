@@ -1,6 +1,6 @@
-﻿// ---------------------------------------------------------------------------- 
+﻿// ----------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// ---------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------
 
 using System;
 using System.Linq;
@@ -16,6 +16,7 @@ namespace Microsoft.Azure.Mobile.Server.Tables
     {
         private const string Version = "Version";
         private const string Deleted = "Deleted";
+        private const string Id = "Id";
 
         private const int MinPageSize = 1;
         private const int DefaultPageSize = 50;
@@ -41,6 +42,17 @@ namespace Microsoft.Azure.Mobile.Server.Tables
             get
             {
                 return Deleted;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <c>Id</c> property name.
+        /// </summary>
+        public static string IdPropertyName
+        {
+            get
+            {
+                return Id;
             }
         }
 

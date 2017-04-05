@@ -230,6 +230,28 @@ namespace Microsoft.Azure.Mobile.Server
         }
 
         [Fact]
+        public async Task InsertAsync_BulkInsertsDataWithNoIdAndUpdatesTimestamp()
+        {
+            var movies = TestData.Movies.Select(movie =>
+            {
+                movie.Id = null;
+                movie.CreatedAt = null;
+                movie.UpdatedAt = null;
+
+                return movie;
+            });
+
+            var results = await this.manager.InsertAsync(movies);
+
+            foreach (Movie result in results)
+            {
+                Assert.NotNull(result.Id);
+                Assert.True(result.CreatedAt.HasValue);
+                Assert.NotNull(result.UpdatedAt);
+            }
+        }
+
+        [Fact]
         public async Task InsertAsync_InsertsDataWithValidIdAndUpdatesTimestamp()
         {
             // Arrange
@@ -269,6 +291,22 @@ namespace Microsoft.Azure.Mobile.Server
         }
 
         [Fact]
+        public async Task InsertAsync_BulkInsert_Throws_BadRequest_IfDataValidationFails()
+        {
+            var movies = TestData.Movies.Select((movie, i) =>
+            {
+                movie.Id = Guid.NewGuid().ToString("N");
+                movie.CreatedAt = null;
+                movie.UpdatedAt = null;
+                movie.RunTimeMinutes = i == 0 ? -1 : movie.RunTimeMinutes;
+                return movie;
+            });
+
+            HttpResponseException ex = await AssertEx.ThrowsAsync<HttpResponseException>(async () => await this.manager.InsertAsync(movies));
+            Assert.Equal(HttpStatusCode.BadRequest, ex.Response.StatusCode);
+        }
+
+        [Fact]
         public async Task InsertAsync_Throws_Conflict_IfDuplicateKeys()
         {
             // Arrange
@@ -286,6 +324,22 @@ namespace Microsoft.Azure.Mobile.Server
 
             Assert.Equal(HttpStatusCode.Conflict, ex.Response.StatusCode);
             Assert.Contains("The operation failed due to a conflict: 'Violation of PRIMARY KEY constraint 'PK_dbo.Movies'. Cannot insert duplicate key in object 'dbo.Movies'. The duplicate key value is ", error.Message);
+        }
+
+        [Fact]
+        public async Task InsertAsync_BulkInsert_Throws_Conflict_IfDuplicateKeys()
+        {
+            var movies = TestData.Movies;
+
+            // insert once
+            await this.manager.InsertAsync(movies);
+
+            // insert again with the same Id
+            HttpResponseException ex = await AssertEx.ThrowsAsync<HttpResponseException>(async () => await this.manager.InsertAsync(movies));
+            HttpError error;
+            ex.Response.TryGetContentValue(out error);
+
+            Assert.Equal(HttpStatusCode.Conflict, ex.Response.StatusCode);
         }
 
         [Fact]
@@ -330,6 +384,42 @@ namespace Microsoft.Azure.Mobile.Server
                 Movie result = await this.manager.UpdateAsync(id, patch);
 
                 Assert.Equal(id, result.Id);
+                Assert.Equal(UpdatedCategory, result.Category);
+                Assert.NotNull(result.UpdatedAt);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateAsync_BulkUpdatesCurrentValues()
+        {
+            List<Movie> movies = TestData.Movies.Select(movie =>
+            {
+                movie.Id = Guid.NewGuid().ToString("N");
+                movie.CreatedAt = null;
+                movie.UpdatedAt = null;
+
+                return movie;
+            }).ToList();
+
+            await this.manager.InsertAsync(movies);
+
+            List<Delta<Movie>> patches = new List<Delta<Movie>>();
+
+            foreach (Movie movie in movies)
+            {
+                Delta<Movie> patch = new Delta<Movie>();
+                patch.TrySetPropertyValue("Id", movie.Id);
+                patch.TrySetPropertyValue("Category", UpdatedCategory);
+                patches.Add(patch);
+            }
+
+            IEnumerable<Movie> results = await this.manager.UpdateAsync(patches);
+
+            foreach (Movie movie in movies)
+            {
+                Movie result = results.Single(x => x.Id == movie.Id);
+
+                Assert.Equal(movie.Id, result.Id);
                 Assert.Equal(UpdatedCategory, result.Category);
                 Assert.NotNull(result.UpdatedAt);
             }
