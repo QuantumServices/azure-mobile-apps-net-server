@@ -202,6 +202,35 @@ namespace Microsoft.Azure.Mobile.Server
         }
 
         /// <summary>
+        /// Provides a helper method for inserting an entities into a backend store. It deals with any model validation errors as well as
+        /// exceptions thrown by the <see cref="IDomainManager{TData}"/> and maps them into appropriate HTTP responses.
+        /// </summary>
+        /// <returns>A <see cref="Task{IQueryable}"/> representing the insert operation executed by the the <see cref="IDomainManager{TData}"/>.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed in the response path.")]
+        protected async virtual Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> items)
+        {
+            if (items == null)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, TResources.TableController_NullRequestBody));
+            }
+
+            try
+            {
+                return await this.DomainManager.InsertAsync(items);
+            }
+            catch (HttpResponseException ex)
+            {
+                this.traceWriter.Error(ex, this.Request, LogCategories.TableControllers);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                this.traceWriter.Error(ex, this.Request, LogCategories.TableControllers);
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex));
+            }
+        }
+
+        /// <summary>
         /// Provides a helper method for updating an entity in a backend store. It deals with any model validation errors as well as
         /// exceptions thrown by the <see cref="IDomainManager{TData}"/> and maps them into appropriate HTTP responses.
         /// </summary>

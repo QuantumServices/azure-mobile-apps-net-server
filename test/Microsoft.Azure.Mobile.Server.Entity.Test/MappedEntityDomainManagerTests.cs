@@ -697,6 +697,16 @@ namespace Microsoft.Azure.Mobile.Server
                     this.Context.Entry(model).OriginalValues[TableUtils.VersionPropertyName] = version;
                 }
             }
+
+            public override Task<IQueryable<Movie>> InsertAsync(IEnumerable<Movie> data)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override Task<IEnumerable<Movie>> UpdateAsync(IEnumerable<Delta<Movie>> patches)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

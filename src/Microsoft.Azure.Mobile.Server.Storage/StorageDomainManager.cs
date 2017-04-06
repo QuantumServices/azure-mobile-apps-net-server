@@ -524,7 +524,7 @@ namespace Microsoft.Azure.Mobile.Server
                 else if (exception.RequestInformation.ExtendedErrorInformation.ErrorCode == StorageErrorCodeStrings.ConditionNotMet ||
                          exception.RequestInformation.ExtendedErrorInformation.ErrorCode == TableErrorCodeStrings.UpdateConditionNotSatisfied)
                 {
-                    // the two values above indicate that the etag doesn't match, but the error thrown from the emulator 
+                    // the two values above indicate that the etag doesn't match, but the error thrown from the emulator
                     // is different from that in the service, so both must be included
 
                     var content = await this.GetCurrentItem(key);
@@ -761,6 +761,16 @@ namespace Microsoft.Azure.Mobile.Server
             }
 
             return first;
+        }
+
+        public override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -38,6 +40,16 @@ namespace ZumoE2EServerApp.Utils
         private long ConvertId(string id)
         {
             return Convert.ToInt64(id);
+        }
+
+        public override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
+        {
+            throw new NotImplementedException();
         }
     }
 }

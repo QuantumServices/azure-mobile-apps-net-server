@@ -2,6 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -81,6 +82,16 @@ namespace ZumoE2EServerApp.Utils
         {
             TKey tkey = GetKey<TKey>(id);
             return this.DeleteItemAsync(tkey);
+        }
+
+        public override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
+        {
+            throw new NotImplementedException();
         }
     }
 }

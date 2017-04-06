@@ -98,5 +98,15 @@ namespace ZumoE2EServerApp.Utils
                 return Task.FromResult(ret);
             }
         }
+
+        public Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

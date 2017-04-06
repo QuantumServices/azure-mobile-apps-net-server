@@ -56,17 +56,6 @@ namespace Microsoft.Azure.Mobile.Server.Serialization
             }
         }
 
-        public static TheoryData<IEnumerable<Delta<DeltaTest>>> EnumDeltaType
-        {
-            get
-            {
-                return new TheoryData<IEnumerable<Delta<DeltaTest>>>
-                {
-                   new Delta<DeltaTest>
-                }
-            }
-        }
-
         public static TheoryDataCollection<Type> DeltaTypes
         {
             get

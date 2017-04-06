@@ -127,7 +127,7 @@ namespace Microsoft.Azure.Mobile.Server
             return data;
         }
 
-        public async Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        public async override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
         {
             if (data == null)
             {
@@ -159,7 +159,7 @@ namespace Microsoft.Azure.Mobile.Server
             return await this.UpdateAsync(id, patch, this.IncludeDeleted);
         }
 
-        public async Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
+        public async override Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
         {
             return await this.UpdateAsync(patches, this.IncludeDeleted);
         }
@@ -349,12 +349,16 @@ namespace Microsoft.Azure.Mobile.Server
             foreach (TData item in current)
             {
                 Delta<TData> patch = patches.Single(x => x.GetPropertyValueOrDefault<TData, string>(TableUtils.IdPropertyName) == item.Id);
+
                 byte[] patchVersion = patch.GetPropertyValueOrDefault<TData, byte[]>(TableUtils.VersionPropertyName);
                 if (patchVersion != null)
                 {
                     this.context.Entry(item).OriginalValues[TableUtils.VersionPropertyName] = patchVersion;
                 }
+
+                string id = patch.GetPropertyValueOrDefault<TData, string>(TableUtils.IdPropertyName);
                 patch.Patch(item);
+                this.VerifyUpdatedKey(id, item);
             }
 
             await this.SubmitChangesAsync();

@@ -1,8 +1,9 @@
-﻿// ---------------------------------------------------------------------------- 
+﻿// ----------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// ---------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net.Http;
@@ -69,6 +70,16 @@ namespace Local.Models
         {
             int orderId = GetKey<int>(id);
             return DeleteItemAsync(orderId);
+        }
+
+        public override Task<IQueryable<BrownOnline>> InsertAsync(IEnumerable<BrownOnline> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<BrownOnline>> UpdateAsync(IEnumerable<Delta<BrownOnline>> patches)
+        {
+            throw new NotImplementedException();
         }
     }
 }

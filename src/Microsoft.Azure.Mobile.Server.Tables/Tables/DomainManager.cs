@@ -142,6 +142,13 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         public abstract Task<TData> InsertAsync(TData data);
 
         /// <summary>
+        /// Inserts items to the backend store.
+        /// </summary>
+        /// <param name="data">The data to be inserted</param>
+        /// <returns>The inserted items</returns>
+        public abstract Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data);
+
+        /// <summary>
         /// Updates an existing item by applying a <see cref="Delta{T}"/> patch to it. The <see cref="Delta{T}"/>
         /// abstraction keeps track of which properties have changed which avoids problems with default values and
         /// the like.
@@ -150,6 +157,14 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         /// <param name="patch">The patch to apply.</param>
         /// <returns>The patched item.</returns>
         public abstract Task<TData> UpdateAsync(string id, Delta<TData> patch);
+
+        /// <summary>
+        /// Updates existing items by applying <see cref="Delta{T}"/> patches to them. The <see cref="Delta{T}"/>
+        /// abstract keeps track of which properties have changed which avoids problems with default values and the like.
+        /// </summary>
+        /// <param name="patches">The patch to apply. This should include the Id of the item to apply the patch to.</param>
+        /// <returns>The patched items.</returns>
+        public abstract Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches);
 
         /// <summary>
         /// Completely replaces an existing item.

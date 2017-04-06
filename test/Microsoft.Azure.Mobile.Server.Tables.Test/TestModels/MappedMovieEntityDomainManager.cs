@@ -2,6 +2,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -57,6 +60,16 @@ namespace Microsoft.Azure.Mobile.Server.TestModels
         protected override void SetOriginalVersion(MovieModel model, byte[] version)
         {
             this.context.Entry(model).OriginalValues["Version"] = version;
+        }
+
+        public override Task<IQueryable<Movie>> InsertAsync(IEnumerable<Movie> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<Movie>> UpdateAsync(IEnumerable<Delta<Movie>> patches)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Web.Http.OData;
 using Microsoft.Azure.Mobile.Server;
 using ZumoE2EServerApp.DataObjects;
 using ZumoE2EServerApp.Models;
+using System.Collections.Generic;
 
 namespace ZumoE2EServerApp.Controllers
 {
@@ -41,6 +42,12 @@ namespace ZumoE2EServerApp.Controllers
         {
             BlogComments current = await InsertAsync(item);
             return CreatedAtRoute("Tables", new { id = current.Id }, current);
+        }
+
+        [Route("tables/blog_commentss")]
+        public async Task<IQueryable<BlogComments>> PostAll(IEnumerable<BlogComments> items)
+        {
+            return await InsertAsync(items);
         }
 
         // DELETE tables/blog_comments/48D68C86-6EA6-4C25-AA33-223FC9A27959

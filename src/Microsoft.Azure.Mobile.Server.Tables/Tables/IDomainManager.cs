@@ -1,6 +1,6 @@
-﻿// ---------------------------------------------------------------------------- 
+﻿// ----------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// ---------------------------------------------------------------------------- 
+// ----------------------------------------------------------------------------
 
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         where TData : class, ITableData
     {
         /// <summary>
-        /// Builds an <see cref="IQueryable{T}"/> to be executed against a store supporting <see cref="IQueryable{T}"/> for querying data. 
+        /// Builds an <see cref="IQueryable{T}"/> to be executed against a store supporting <see cref="IQueryable{T}"/> for querying data.
         /// </summary>
         /// <remarks>
         /// See also <see cref="M:Lookup"/> which is the companion method for creating an <see cref="IQueryable{T}"/> representing a single item.
@@ -35,8 +35,8 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         /// <summary>
         /// Builds an <see cref="IQueryable{T}"/> to be executed against a store supporting <see cref="IQueryable{T}"/> for looking up a single item.
         /// </summary>
-        /// <param name="id">The id representing the item. The id is provided as part of the <see cref="ITableData"/> and is visible to the client. 
-        /// However, depending on the backend store and the domain model, the particular implementation may map the id to some other form of unique 
+        /// <param name="id">The id representing the item. The id is provided as part of the <see cref="ITableData"/> and is visible to the client.
+        /// However, depending on the backend store and the domain model, the particular implementation may map the id to some other form of unique
         /// identifier.</param>
         /// <remarks>
         /// See also <see cref="M:Query"/> which is the companion method for creating an <see cref="IQueryable{T}"/> representing multiple items.
@@ -55,15 +55,15 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         Task<IEnumerable<TData>> QueryAsync(ODataQueryOptions query);
 
         /// <summary>
-        /// Looks up a single item in the backend store. 
+        /// Looks up a single item in the backend store.
         /// </summary>
-        /// <param name="id">The id representing the item. The id is provided as part of the <see cref="ITableData"/> and is visible to the client. 
-        /// However, depending on the backend store and the domain model, the particular implementation may map the id to some other form of unique 
+        /// <param name="id">The id representing the item. The id is provided as part of the <see cref="ITableData"/> and is visible to the client.
+        /// However, depending on the backend store and the domain model, the particular implementation may map the id to some other form of unique
         /// identifier.</param>
         /// <remarks>
         /// See also <see cref="M:QueryAsync"/> which is the companion method for executing a query for multiple items.
         /// </remarks>
-        /// <returns>A <see cref="SingleResult{T}"/> representing the result of the lookup. A <see cref="SingleResult{T}"/> represents an 
+        /// <returns>A <see cref="SingleResult{T}"/> representing the result of the lookup. A <see cref="SingleResult{T}"/> represents an
         /// <see cref="IQueryable"/> containing zero or one entities. This allows it to be composed with further querying such as <c>$select</c>.</returns>
         Task<SingleResult<TData>> LookupAsync(string id);
 
@@ -73,6 +73,13 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         /// <param name="data">The data to be inserted</param>
         /// <returns>The inserted item.</returns>
         Task<TData> InsertAsync(TData data);
+
+        /// <summary>
+        /// Inserts items to the backend store.
+        /// </summary>
+        /// <param name="data">The data to be inserted</param>
+        /// <returns>The inserted items</returns>
+        Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data);
 
         /// <summary>
         /// Updates an existing item by applying a <see cref="Delta{T}"/> patch to it. The <see cref="Delta{T}"/>
@@ -85,10 +92,18 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         Task<TData> UpdateAsync(string id, Delta<TData> patch);
 
         /// <summary>
+        /// Updates existing items by applying <see cref="Delta{T}"/> patches to them. The <see cref="Delta{T}"/>
+        /// abstract keeps track of which properties have changed which avoids problems with default values and the like.
+        /// </summary>
+        /// <param name="patches">The patch to apply. This should include the Id of the item to apply the patch to.</param>
+        /// <returns>The patched items.</returns>
+        Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches);
+
+        /// <summary>
         /// Completely replaces an existing item.
         /// </summary>
         /// <param name="id">The id of the item to replace.</param>
-        /// <param name="data">The replacement</param>       
+        /// <param name="data">The replacement</param>
         /// <returns>The replaced item</returns>
         Task<TData> ReplaceAsync(string id, TData data);
 
