@@ -44,10 +44,16 @@ namespace ZumoE2EServerApp.Controllers
             return CreatedAtRoute("Tables", new { id = current.Id }, current);
         }
 
-        [Route("tables/blog_commentss")]
-        public async Task<IQueryable<BlogComments>> PostAll(IEnumerable<BlogComments> items)
+        [Route("tables/blog_comments/bulk")]
+        public async Task<IEnumerable<BlogComments>> PostAll(IEnumerable<BlogComments> items)
         {
             return await InsertAsync(items);
+        }
+
+        [Route("tables/blog_comments/bulk")]
+        public async Task<IEnumerable<BlogComments>> PatchAll(IEnumerable<Delta<BlogComments>> patches)
+        {
+            return await UpdateAsync(patches);
         }
 
         // DELETE tables/blog_comments/48D68C86-6EA6-4C25-AA33-223FC9A27959

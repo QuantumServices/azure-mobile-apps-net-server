@@ -146,7 +146,7 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         /// </summary>
         /// <param name="data">The data to be inserted</param>
         /// <returns>The inserted items</returns>
-        public abstract Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data);
+        public abstract Task<IEnumerable<TData>> InsertAsync(IEnumerable<TData> data);
 
         /// <summary>
         /// Updates an existing item by applying a <see cref="Delta{T}"/> patch to it. The <see cref="Delta{T}"/>

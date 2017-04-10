@@ -99,7 +99,7 @@ namespace ZumoE2EServerApp.Utils
             }
         }
 
-        public Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        public Task<IEnumerable<TData>> InsertAsync(IEnumerable<TData> data)
         {
             throw new NotImplementedException();
         }

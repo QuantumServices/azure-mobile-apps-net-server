@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Mobile.Server.TestModels
             this.context.Entry(model).OriginalValues["Version"] = version;
         }
 
-        public override Task<IQueryable<TestEntity>> InsertAsync(IEnumerable<TestEntity> data)
+        public override Task<IEnumerable<TestEntity>> InsertAsync(IEnumerable<TestEntity> data)
         {
             throw new NotImplementedException();
         }

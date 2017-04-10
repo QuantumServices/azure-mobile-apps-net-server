@@ -127,7 +127,7 @@ namespace Microsoft.Azure.Mobile.Server
             return data;
         }
 
-        public async override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        public async override Task<IEnumerable<TData>> InsertAsync(IEnumerable<TData> data)
         {
             if (data == null)
             {

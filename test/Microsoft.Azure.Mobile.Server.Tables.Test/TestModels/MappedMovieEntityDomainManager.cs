@@ -62,7 +62,7 @@ namespace Microsoft.Azure.Mobile.Server.TestModels
             this.context.Entry(model).OriginalValues["Version"] = version;
         }
 
-        public override Task<IQueryable<Movie>> InsertAsync(IEnumerable<Movie> data)
+        public override Task<IEnumerable<Movie>> InsertAsync(IEnumerable<Movie> data)
         {
             throw new NotImplementedException();
         }

@@ -42,7 +42,7 @@ namespace ZumoE2EServerApp.Utils
             return Convert.ToInt64(id);
         }
 
-        public override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        public override Task<IEnumerable<TData>> InsertAsync(IEnumerable<TData> data)
         {
             throw new NotImplementedException();
         }

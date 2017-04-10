@@ -84,7 +84,7 @@ namespace ZumoE2EServerApp.Utils
             return this.DeleteItemAsync(tkey);
         }
 
-        public override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        public override Task<IEnumerable<TData>> InsertAsync(IEnumerable<TData> data)
         {
             throw new NotImplementedException();
         }

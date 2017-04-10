@@ -207,7 +207,7 @@ namespace Microsoft.Azure.Mobile.Server
         /// </summary>
         /// <returns>A <see cref="Task{IQueryable}"/> representing the insert operation executed by the the <see cref="IDomainManager{TData}"/>.</returns>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed in the response path.")]
-        protected async virtual Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> items)
+        protected async virtual Task<IEnumerable<TData>> InsertAsync(IEnumerable<TData> items)
         {
             if (items == null)
             {
@@ -238,6 +238,16 @@ namespace Microsoft.Azure.Mobile.Server
         protected virtual Task<TData> UpdateAsync(string id, Delta<TData> patch)
         {
             return this.PatchAsync(id, patch, (i, p) => this.DomainManager.UpdateAsync(i, p));
+        }
+
+        /// <summary>
+        /// Provides a helper method for updating entities in a backend store. All entities need to have the Id and Version properties populated. It deals with any model validation errors as well as
+        /// exceptions thrown by the <see cref="IDomainManager{TData}"/> and maps them into appropriate HTTP responses.
+        /// </summary>
+        /// <returns>A <see cref="Task{IEnumerable}"/> representing the update operation executed by the the <see cref="IDomainManager{TData}"/>.</returns>
+        protected virtual Task<IEnumerable<TData>> UpdateAsync(IEnumerable<Delta<TData>> patches)
+        {
+            return this.DomainManager.UpdateAsync(patches);
         }
 
         /// <summary>

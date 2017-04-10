@@ -763,7 +763,7 @@ namespace Microsoft.Azure.Mobile.Server
             return first;
         }
 
-        public override Task<IQueryable<TData>> InsertAsync(IEnumerable<TData> data)
+        public override Task<IEnumerable<TData>> InsertAsync(IEnumerable<TData> data)
         {
             throw new NotImplementedException();
         }

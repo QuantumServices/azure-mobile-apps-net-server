@@ -72,7 +72,7 @@ namespace Local.Models
             return DeleteItemAsync(orderId);
         }
 
-        public override Task<IQueryable<BrownOnline>> InsertAsync(IEnumerable<BrownOnline> data)
+        public override Task<IEnumerable<BrownOnline>> InsertAsync(IEnumerable<BrownOnline> data)
         {
             throw new NotImplementedException();
         }
