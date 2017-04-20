@@ -648,6 +648,63 @@ namespace Microsoft.Azure.Mobile.Server
         }
 
         [Fact]
+        public async Task DeleteAsync_BulkDeletesData()
+        {
+            Collection<Movie> movies = TestData.Movies;
+
+            foreach (Movie movie in movies)
+            {
+                string id = Guid.NewGuid().ToString("N");
+                movie.Id = id;
+                movie.CreatedAt = null;
+                movie.UpdatedAt = null;
+            }
+
+            await this.manager.InsertAsync(movies);
+
+            bool result = await this.manager.DeleteAsync(movies.Select(movie => movie.Id));
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_Bulk_MarksAsDeleted_IfSoftDeleteIsTrue()
+        {
+            Collection<Movie> movies = TestData.Movies;
+
+            foreach (Movie movie in movies)
+            {
+                string id = Guid.NewGuid().ToString("N");
+                movie.Id = id;
+                movie.CreatedAt = null;
+                movie.UpdatedAt = null;
+            }
+
+            await this.manager.InsertAsync(movies);
+            this.manager.IncludeDeleted = false;
+            this.manager.EnableSoftDelete = true;
+
+            bool result = await this.manager.DeleteAsync(movies.Select(movie => movie.Id));
+
+            Assert.True(result);
+
+            foreach (Movie movie in movies)
+            {
+                this.manager.IncludeDeleted = false;
+                Movie lookedup = this.manager.Lookup(movie.Id).Queryable.FirstOrDefault();
+                Assert.Null(lookedup);
+
+                this.manager.IncludeDeleted = true;
+                lookedup = this.manager.Lookup(movie.Id).Queryable.First();
+
+                Assert.Equal(movie.Id, lookedup.Id);
+                Assert.Equal(true, lookedup.Deleted);
+                Assert.Equal(movie.Name, lookedup.Name);
+                Assert.Equal(movie.Category, lookedup.Category);
+            }
+        }
+
+        [Fact]
         public async Task DeleteAsync_MarksAsDeleted_IfSoftDeleteIsTrue()
         {
             // Arrange
@@ -688,6 +745,16 @@ namespace Microsoft.Azure.Mobile.Server
             bool result = await this.manager.DeleteAsync(id);
 
             // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_Bulk_ReturnsFalse_IfIdNotFound()
+        {
+            IEnumerable<string> ids = Enumerable.Range(0, 10).Select(i => Guid.NewGuid().ToString("N"));
+
+            bool result = await this.manager.DeleteAsync(ids);
+
             Assert.False(result);
         }
 

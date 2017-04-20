@@ -707,6 +707,11 @@ namespace Microsoft.Azure.Mobile.Server
             {
                 throw new NotImplementedException();
             }
+
+            public override Task<bool> DeleteAsync(IEnumerable<string> ids)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

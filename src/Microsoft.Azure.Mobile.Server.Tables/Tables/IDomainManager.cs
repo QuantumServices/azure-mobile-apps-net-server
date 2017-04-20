@@ -113,5 +113,12 @@ namespace Microsoft.Azure.Mobile.Server.Tables
         /// <param name="id">The id of the item to delete.</param>
         /// <returns><c>true</c> if item was deleted; otherwise <c>false</c></returns>
         Task<bool> DeleteAsync(string id);
+
+        /// <summary>
+        /// Deletes existing items
+        /// </summary>
+        /// <param name="ids">The ids of the items to delete.</param>
+        /// <returns><c>true</c> if items are deleted; otherwise <c>false</c></returns>
+        Task<bool> DeleteAsync(IEnumerable<string> ids);
     }
 }

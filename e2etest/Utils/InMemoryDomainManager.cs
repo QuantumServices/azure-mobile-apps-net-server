@@ -108,5 +108,10 @@ namespace ZumoE2EServerApp.Utils
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> DeleteAsync(IEnumerable<string> ids)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -147,7 +147,6 @@ namespace Microsoft.Azure.Mobile.Server
             {
                 this.Context.Set<TData>().Add(dataItem);
             }
-            //this.Context.Set<TData>().AddRange(dataItems);
 
             await this.SubmitChangesAsync();
 
@@ -230,6 +229,37 @@ namespace Microsoft.Azure.Mobile.Server
             if (version != null)
             {
                 this.context.Entry(current).OriginalValues[TableUtils.VersionPropertyName] = version;
+            }
+
+            int result = await this.SubmitChangesAsync();
+            return result > 0;
+        }
+
+        public override async Task<bool> DeleteAsync(IEnumerable<string> ids)
+        {
+            if (ids == null)
+            {
+                throw new ArgumentNullException("ids");
+            }
+
+            List<TData> current = await this.Lookup(ids, this.IncludeDeleted).ToListAsync();
+
+            // Check if all the entities exist
+            if (!current.All(x => ids.Contains(x.Id)))
+            {
+                return false;
+            }
+
+            if (this.EnableSoftDelete)
+            {
+                foreach (TData item in current)
+                {
+                    item.Deleted = true;
+                }
+            }
+            else
+            {
+                this.Context.Set<TData>().RemoveRange(current);
             }
 
             int result = await this.SubmitChangesAsync();

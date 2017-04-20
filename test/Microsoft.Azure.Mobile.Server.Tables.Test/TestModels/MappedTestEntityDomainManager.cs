@@ -71,5 +71,10 @@ namespace Microsoft.Azure.Mobile.Server.TestModels
         {
             throw new NotImplementedException();
         }
+
+        public override Task<bool> DeleteAsync(IEnumerable<string> ids)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

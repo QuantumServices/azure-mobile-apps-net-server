@@ -421,6 +421,11 @@ namespace Microsoft.Azure.Mobile.Server
             return deleted;
         }
 
+        public override Task<bool> DeleteAsync(IEnumerable<string> ids)
+        {
+            throw new NotImplementedException();
+        }
+
         protected virtual CloudStorageAccount GetCloudStorageAccount(string connectionStringName)
         {
             IMobileAppSettingsProvider provider = this.Request.GetConfiguration().GetMobileAppSettingsProvider();
