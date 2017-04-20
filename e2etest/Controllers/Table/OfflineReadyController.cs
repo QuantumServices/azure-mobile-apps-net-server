@@ -58,6 +58,12 @@ namespace ZumoE2EServerApp.Controllers
             return await UpdateAsync(patches);
         }
 
+        [Route("tables/offlineready/bulk")]
+        public Task DeleteAll(IEnumerable<string> ids)
+        {
+            return DeleteAsync(ids);
+        }
+
         public Task Delete(string id)
         {
             return DeleteAsync(id);

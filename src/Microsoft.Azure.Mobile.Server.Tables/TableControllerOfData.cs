@@ -353,6 +353,36 @@ namespace Microsoft.Azure.Mobile.Server
             }
         }
 
+        /// <summary>
+        /// Provides a helper method for deleting entities from a backend store. It deals with any
+        /// exceptions thrown by the <see cref="IDomainManager{TData}"/> and maps them into appropriate HTTP responses.
+        /// </summary>
+        /// <returns>A <see cref="Task{TData}"/> representing the delete operation executed by the the <see cref="IDomainManager{TData}"/>.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed in the response path.")]
+        protected virtual async Task DeleteAsync(IEnumerable<string> ids)
+        {
+            bool result = false;
+            try
+            {
+                result = await this.DomainManager.DeleteAsync(ids);
+            }
+            catch (HttpResponseException ex)
+            {
+                this.traceWriter.Error(ex, this.Request, LogCategories.TableControllers);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                this.traceWriter.Error(ex, this.Request, LogCategories.TableControllers);
+                throw new HttpResponseException(this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex));
+            }
+
+            if (!result)
+            {
+                throw new HttpResponseException(this.Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+        }
+
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Response is disposed in the response path.")]
         private async Task<TData> PatchAsync(string id, Delta<TData> patch, Func<string, Delta<TData>, Task<TData>> patchAction)
         {
