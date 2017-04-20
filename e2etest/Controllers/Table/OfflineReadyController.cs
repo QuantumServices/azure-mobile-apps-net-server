@@ -10,6 +10,7 @@ using System.Web.Http.OData;
 using Microsoft.Azure.Mobile.Server;
 using ZumoE2EServerApp.DataObjects;
 using ZumoE2EServerApp.Models;
+using System.Collections.Generic;
 
 namespace ZumoE2EServerApp.Controllers
 {
@@ -43,6 +44,18 @@ namespace ZumoE2EServerApp.Controllers
         public Task<OfflineReady> Patch(string id, Delta<OfflineReady> item)
         {
             return UpdateAsync(id, item);
+        }
+
+        [Route("tables/offlineready/bulk")]
+        public async Task<IEnumerable<OfflineReady>> PostAll(IEnumerable<OfflineReady> items)
+        {
+            return await InsertAsync(items);
+        }
+
+        [Route("tables/offlineready/bulk")]
+        public async Task<IEnumerable<OfflineReady>> PatchAll(IEnumerable<Delta<OfflineReady>> patches)
+        {
+            return await UpdateAsync(patches);
         }
 
         public Task Delete(string id)

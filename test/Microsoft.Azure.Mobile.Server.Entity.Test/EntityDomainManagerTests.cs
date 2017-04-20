@@ -511,6 +511,36 @@ namespace Microsoft.Azure.Mobile.Server
         }
 
         [Fact]
+        public async Task UpdateAsync_Bulk_Throws_Conflict_IfVersionMisMatch()
+        {
+            //Arrange
+            List<Movie> movies = Enumerable.Range(0, 2000).Select(i => new Movie()
+            {
+                Category = "ha",
+                Name = $"ha{i}",
+                Rating = $"PG-{i}",
+                ReleaseDate = DateTime.Now.AddDays(i),
+                RunTimeMinutes = i
+            }).ToList();
+
+            await this.manager.InsertAsync(movies);
+
+            List<Delta<Movie>> patches = new List<Delta<Movie>>();
+
+            foreach (Movie movie in movies)
+            {
+                Delta<Movie> patch = new Delta<Movie>();
+                patch.TrySetPropertyValue("Id", movie.Id);
+                patch.TrySetPropertyValue("Category", UpdatedCategory);
+                patch.TrySetPropertyValue("Version", Encoding.UTF8.GetBytes("Unknown"));
+                patches.Add(patch);
+            }
+            this.context = new MovieContext();
+            EntityDomainManagerMock updateDomainManager = new EntityDomainManagerMock(this);
+            IEnumerable<Movie> results = await updateDomainManager.UpdateAsync(patches);
+        }
+
+        [Fact]
         public async Task ReplaceAsync_ReplacesData()
         {
             // Arrange
