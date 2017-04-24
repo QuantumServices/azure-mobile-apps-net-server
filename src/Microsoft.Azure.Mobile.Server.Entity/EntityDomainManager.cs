@@ -277,6 +277,16 @@ namespace Microsoft.Azure.Mobile.Server
         }
 
         /// <summary>
+        /// Submits the changes through Entity Framework while logging any exceptions
+        /// and produce appropriate <see cref="HttpResponseMessage"/> instances.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the operation.</returns>
+        protected virtual Task<int> SubmitBulkChangesAsync()
+        {
+            return EntityUtils.SubmitChangesAsync(this.Context, this.Request, this.GetOriginalValues);
+        }
+
+        /// <summary>
         /// Gets the original value of an entity in case an update or replace operation
         /// resulted in an <see cref="DbUpdateConcurrencyException"/>. The original value extracted
         /// from the exception will get returned to the client so that it can merge the data and
@@ -296,6 +306,28 @@ namespace Microsoft.Azure.Mobile.Server
 
             DbPropertyValues values = entry.GetDatabaseValues();
             return values != null ? values.ToObject() : null;
+        }
+
+        /// <summary>
+        /// Gets the original values of an entities in case an update or replace operation
+        /// resulted in an <see cref="DbUpdateConcurrencyException"/>. The original values extracted
+        /// from the exception will get returned to the client so that it can merge the data and
+        /// possibly try the operation again.
+        /// </summary>
+        /// <param name="conflict">The <see cref="DbUpdateConcurrencyException"/> thrown by
+        /// the update or replace operation.</param>
+        /// <returns>The original value or <c>null</c> if none are available.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "keeping the derived class is better from a usability point of view.")]
+        protected object GetOriginalValues(DbUpdateConcurrencyException conflict)
+        {
+            var localItems = this.Context.Set<TData>().Local.ToList();
+            var dbItems = this.Lookup(localItems.Select(item => item.Id), this.IncludeDeleted).AsNoTracking().ToList();
+            var query = from db in dbItems
+                        join local in localItems on db.Id equals local.Id
+                        where !local.Version.SequenceEqual(db.Version)
+                        select db;
+
+            return query.ToList();
         }
 
         /// <summary>
@@ -391,7 +423,7 @@ namespace Microsoft.Azure.Mobile.Server
                 this.VerifyUpdatedKey(id, item);
             }
 
-            await this.SubmitChangesAsync();
+            await this.SubmitBulkChangesAsync();
 
             return current;
         }

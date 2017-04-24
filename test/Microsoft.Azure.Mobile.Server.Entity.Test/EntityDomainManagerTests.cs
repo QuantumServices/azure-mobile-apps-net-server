@@ -514,7 +514,8 @@ namespace Microsoft.Azure.Mobile.Server
         public async Task UpdateAsync_Bulk_Throws_Conflict_IfVersionMisMatch()
         {
             //Arrange
-            List<Movie> movies = Enumerable.Range(0, 2000).Select(i => new Movie()
+            int conflictNumber = 11;
+            List<Movie> movies = Enumerable.Range(0, 100).Select(i => new Movie()
             {
                 Category = "ha",
                 Name = $"ha{i}",
@@ -526,18 +527,34 @@ namespace Microsoft.Azure.Mobile.Server
             await this.manager.InsertAsync(movies);
 
             List<Delta<Movie>> patches = new List<Delta<Movie>>();
-
+            int count = conflictNumber;
             foreach (Movie movie in movies)
             {
                 Delta<Movie> patch = new Delta<Movie>();
                 patch.TrySetPropertyValue("Id", movie.Id);
                 patch.TrySetPropertyValue("Category", UpdatedCategory);
-                patch.TrySetPropertyValue("Version", Encoding.UTF8.GetBytes("Unknown"));
+                if (count > 0)
+                {
+                    patch.TrySetPropertyValue("Version", Encoding.UTF8.GetBytes("Unknown"));
+                    count--;
+                }
                 patches.Add(patch);
             }
             this.context = new MovieContext();
             EntityDomainManagerMock updateDomainManager = new EntityDomainManagerMock(this);
-            IEnumerable<Movie> results = await updateDomainManager.UpdateAsync(patches);
+            HttpResponseException ex = await AssertEx.ThrowsAsync<HttpResponseException>(async () => await updateDomainManager.UpdateAsync(patches));
+            IEnumerable<Movie> conflicts;
+            ex.Response.TryGetContentValue<IEnumerable<Movie>>(out conflicts);
+
+            Assert.Equal(HttpStatusCode.Conflict, ex.Response.StatusCode);
+            Assert.Equal(conflictNumber, conflicts.Count());
+
+            foreach (Movie conflict in conflicts)
+            {
+                Movie movie = movies.First(m => m.Id == conflict.Id);
+                Assert.Equal(movie.Category, conflict.Category);
+                Assert.Equal(movie.Version, conflict.Version);
+            }
         }
 
         [Fact]
