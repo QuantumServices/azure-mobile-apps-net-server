@@ -52,7 +52,7 @@ namespace ZumoE2EServerApp.Controllers
             return await InsertAsync(items);
         }
 
-        [Route("tables/{controller}/bulk")]
+        [Route("tables/offlineready/bulk")]
         public async Task<IEnumerable<OfflineReady>> PatchAll(IEnumerable<Delta<OfflineReady>> patches)
         {
             return await UpdateAsync(patches);
