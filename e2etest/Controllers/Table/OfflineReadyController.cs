@@ -46,19 +46,19 @@ namespace ZumoE2EServerApp.Controllers
             return UpdateAsync(id, item);
         }
 
-        [Route("tables/offlineready/bulk")]
+        [Route("tables/bulk/offlineready")]
         public async Task<IEnumerable<OfflineReady>> PostAll(IEnumerable<OfflineReady> items)
         {
             return await InsertAsync(items);
         }
 
-        [Route("tables/offlineready/bulk")]
+        [Route("tables/bulk/offlineready")]
         public async Task<IEnumerable<OfflineReady>> PatchAll(IEnumerable<Delta<OfflineReady>> patches)
         {
             return await UpdateAsync(patches);
         }
 
-        [Route("tables/offlineready/bulk")]
+        [Route("tables/bulk/offlineready")]
         public Task DeleteAll(IEnumerable<string> ids)
         {
             return DeleteAsync(ids);

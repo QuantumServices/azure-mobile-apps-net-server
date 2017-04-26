@@ -298,7 +298,7 @@ namespace Microsoft.Azure.Mobile.Server
                 movie.Id = Guid.NewGuid().ToString("N");
                 movie.CreatedAt = null;
                 movie.UpdatedAt = null;
-                movie.RunTimeMinutes = i == 0 ? -1 : movie.RunTimeMinutes;
+                movie.RunTimeMinutes = -1;
                 return movie;
             });
 
